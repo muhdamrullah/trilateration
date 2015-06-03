@@ -6,7 +6,7 @@ import time
 
 signalPower = 0
 
-#Load JSON data from API
+#Load JSON data from API of a 'specific' MAC address
 def pullApi(macAddress, ipAddress):
     http = 'http://'
     uri = '/todo/api/v1.0/tasks/'
