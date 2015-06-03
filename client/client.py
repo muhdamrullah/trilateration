@@ -5,7 +5,6 @@ from triangulate import triangulate
 import time
 
 signalPower = 0
-
 #Load JSON data from API of a 'specific' MAC address
 def pullApi(macAddress, ipAddress):
     http = 'http://'
@@ -13,7 +12,7 @@ def pullApi(macAddress, ipAddress):
     target = urlparse(http + ipAddress + uri + macAddress) #Combines uri and MAC address into a single line
     url = target.geturl() #Combines into a usable url function
     response = requests.get(url)
-    data = response.json
+    data = response.json #Use json() for MAC computers
     rawData =  data['Face']['power']
     return rawData
 
@@ -21,21 +20,26 @@ def pullApi(macAddress, ipAddress):
 def enterMAC(str, ipstr):
     rawData = pullApi(str, ipstr) 
     SignalStrength = 80 + int(rawData)
-    SignalPower = "{0:0.1f}".format(SignalStrength)
+    SignalPower = float(SignalStrength)
     return SignalPower
    
 #Change the 3 Signal data into a float
 def get Coordinates():
-    SignalPower = enterMAC(MAC_default, IP_first)
-    Signal1 = float(SignalPower)
-    SignalPower = enterMAC(MAC_default, IP_second)
-    Signal2 = float(SignalPower)
-    SignalPower = enterMAC(MAC_default, IP_third)
-    Signal3 = float(SignalPower)
-    coordinates = triangulate([(0.0, 0.0, Signal1), (40.0, 70.0, Signal2), (90.0, 0.0, Signal3)])
+    Signal_for_1 = enterMAC(MAC_default, IP_first)
+    Signal_for_2 = enterMAC(MAC_default, IP_second)
+    Signal_for_3 = enterMAC(MAC_default, IP_third)
+    Signal_for_4 = enterMAC(MAC_default, IP_fourth)
+    Signal1, Signal2, Signal3, Signal4 = [x if x > 0 else 0.1 for x in (Signal_for_1, Signal_for_2, Signal_for_3, Signal_for_4)]
+    coordinates = triangulate([(0.0, 0.0, Signal1), (50.0, 0.0, Signal2), (50.0, 80.0, Signal3), (0.0, 80.0, Signal4])
+    
+    global x
+    global y
+    x = coordinates[0]
+    y = coordinates[0]
     print Signal1
     print Signal2
     print Signal3
+    print Signal4
     print coordinates
     
 """PART II: GUI"""
@@ -50,7 +54,7 @@ turtle.setworldcoordinates(-40, -40, 400, 400)
 #Adding Icon Shapes
 screen = turtle.Screen()
 screen.addshape("MobileSignal.gif")
-t.Mobile.shape("MobileSignal.gif")
+tMobile.shape("MobileSignal.gif")
 
 #Drawing speeds
 t.speed(100)
@@ -79,7 +83,7 @@ def drawBoard():
         
     t.lt(90)
     
-    for i in range(1,width):    #draws vertical lines (x-axis)
+    for i in range(1,length):    #draws vertical lines (x-axis)
         t.goto(40*i,0)
         t.down()
         t.forward(40*width)
@@ -98,6 +102,7 @@ if __name__ == '__main__':
     IP_first = raw_input("Enter the 1st IP Address: ");
     IP_second = raw_input("Enter the 2nd IP Address: ");
     IP_third = raw_input("Enter the 3rd IP Address: ");
+    IP_fourth = raw_input("Enter the 4th IP Address: ");
     #Draw the grid board
     drawBoard()
     #Get coordinates via API every 10 secs and plot it
